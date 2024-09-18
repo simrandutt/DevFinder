@@ -34,6 +34,24 @@ const app = express();
     res.send("saved data into databse successfully")  
   })   
 
+//middleware
+
+const {adminAuth,userAuth} = require("./middleware/auth");
+
+app.use("/admin",adminAuth);
+
+  app.get("/admin/getAllData",(req,res) => {
+    res.send("Get all data successfully")
+  })
+
+  app.get("/user",userAuth,(req,res) => {
+    res.send("Get all data successfully")
+  })
+
+  app.get("/admin/deleteUser",(req,res) => {
+    res.send("Delete successfully")
+  })
+
 //create a server
 app.listen(3000,() => {
   console.log("server successfully listening on this port")
