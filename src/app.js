@@ -52,6 +52,23 @@ app.use("/admin",adminAuth);
     res.send("Delete successfully")
   })
 
+  //error handeling,alway keep wild card handeling error
+  app.use("/",(err,req,res,next) => {
+    if(err){
+      //log errors 
+      res.status(500).send("something went wrong")
+    }
+  })
+
+  //error other way, proper way of handeling
+  app.get("/getUserData",(err,req,res,next) => {
+   try {
+    throw new Error("hjsdhg")
+   } catch(err){
+      res.status(500).send("something went wrong")
+   }
+  })
+
 //create a server
 app.listen(3000,() => {
   console.log("server successfully listening on this port")
