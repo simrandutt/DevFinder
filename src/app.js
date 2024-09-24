@@ -15,27 +15,76 @@ app.listen(3000,() => {
   console.error("database cannot be connected..!!")
 })
 
+app.use(express.json())// middleware that convert json to js object in dynamic post call. express json now activated to all files.
+
 // user model signup
 app.post("/signup",async (req,res)=>{
 
-  const user = new User({
-    firstName: "simran",
-    lastName: "sharma",
-    emailID: "simransharma@gmail.com",
-    password: "pass",
-    age: 27,
-    gender: 'female'
-  })
-  //save user data in schema
+//dynamic passing json into database
+  const user = new User(req.body)
+
+//manually passing json into database
+//   const user = new User({
+//     firstName: "simran",
+//     lastName: "sharma",
+//     emailID: "simransharma@gmail.com",
+//     password: "pass",
+//     age: 27,
+//     gender: 'female'
+//   })
+//   //save user data in schema
   try {
     await user.save()
     res.send("User added successfully!!")
   } catch(err){
     res.status(400).send("Error saving the User:",err.message);
   }
-})
+});
 
+//get user by email,or find user
+app.get("/user",async (req,res)=>{
+  const userEmail = req.body.emailID;
+  try{
+     const users = await User.find({emailID : userEmail});
+     if(users.length === 0 ){
+      res.status(404).send("User not found..")
+     } else{
+      res.send(users);
+     }
+  } catch(err){
+    res.status(400).send("Something went wrong.");
+  }
 
+});
+
+// get data from database, GET / feed
+app.get("/feed",async (req,res)=>{
+  const userEmail = req.body.emailID;
+  try{
+     const users = await User.find({}); //get all users
+     //findbyidupdate,we can addd new key value pair but it will not add in db coz of schema
+    res.send(users);
+  } catch(err){
+    res.status(400).send("Something went wrong.");
+  }
+});
+
+// update user database, GET / feed
+app.patch("/user",async (req,res)=>{
+  const userId = req.body.userId;
+  const data = req.body
+  try{
+     const users = await User.findByIdAndUpdate({_id:userId},data,
+      {
+        returnDocument: 'after',
+        runValidators:true //to make custom type validators work 
+      }); //get all users
+     //findbyidupdate,we can addd new key value pair but it will not add in db coz of schema
+    res.send("User update successfully");
+  } catch(err){
+    res.status(400).send("Update failed"+err.message);
+  }
+});
 
 // --Work----
 
